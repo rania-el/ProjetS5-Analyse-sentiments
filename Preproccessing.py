@@ -4,6 +4,7 @@ import nltk
 import re
 import regexes as regexes
 from nltk import pos_tag
+import string
 
 
 def remove_urls(txt):
@@ -24,6 +25,11 @@ def remove_urls(txt):
 
     return clean_string
 
+
+def remove_punctuation(sentence):
+    for c in string.punctuation:
+        sentence = sentence.replace(c, "")
+    return sentence
 
 def remove_tweet_specific_chars(tokens):
     """
@@ -57,8 +63,9 @@ def preprocess(tweet):
         5. tag each token
     """
 
-    tweet_url_cleaned = remove_urls(tweet) # 3. Remove urls
-    tokens = nltk.word_tokenize(tweet_url_cleaned) # 2. Tokenize the text
+    tweet_url_cleaned = remove_urls(tweet) # 1. Remove urls
+    tweet_no_punct = remove_punctuation(tweet_url_cleaned) #2 Remove punctution
+    tokens = nltk.word_tokenize(tweet_no_punct) # 3. Tokenize the text
     tokens = remove_tweet_specific_chars(tokens)
     #tagged_token=pos_tag(tokens)
     return  tokens
