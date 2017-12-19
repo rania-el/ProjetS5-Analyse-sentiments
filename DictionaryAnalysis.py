@@ -59,8 +59,10 @@ def sentiment(token):
     return tweet_sentiment
 
 
-def analyse_doc(tweetsList):
-    with open(tweetsList, 'r') as raw_data:
+
+"""
+def analyse_extracted_doc(jsondoc):
+    with open(jsondoc, 'r') as raw_data:
         with open('Results/resultsDictionary.json', 'w') as result:
             for line in raw_data:
                 if line != '\n':
@@ -74,7 +76,35 @@ def analyse_doc(tweetsList):
                     json.dump({'tweet': tweet, 'sentiment': tweet_sentiment}, result)
 
     print("SUCCESS")
+"""
+
+def analyse_test_data():
+    with open('Datasets/train.tsv','r') as data_in, open('Results/dictionary_train.tsv', 'w', newline='') as data_out:
+        tsvin = csv.reader(data_in, delimiter='\t')
+        tsvout = csv.writer(data_out,delimiter='\t')
+
+        for row in tsvin:
+            tweet = row[2]
+            token = preprocess(tweet)
+            tweet_sentiment = sentiment(token)
+            print(tweet+' '+tweet_sentiment)
+            tsvout.writerow((row[0], row[1], row[2], tweet_sentiment))
 
 
+analyse_test_data()
+
+def compare():
+    with open('Datasets/train2.tsv','r') as real_data, open('Results/dictionary_train.tsv', 'r') as analysed_data:
+        real_data = csv.reader(real_data, delimiter='\t')
+        analysed_data = csv.reader(analysed_data, delimiter='\t')
+        total=0
+        differences=0
+        for real, analysed in itertools.izip(real_data, analysed_data):
+            total+=1
+            if real[3]!=analysed[3]:
+                print ("difference")
+                differences+=1
+
+    print(str(differences) + " differenes out of "+str(total))
 
 
