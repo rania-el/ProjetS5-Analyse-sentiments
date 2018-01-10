@@ -20,8 +20,6 @@ def extract(document):
 
 
 tweets = extract('Datasets/train.tsv')
-print(tweets)
-
 
 def filter_tweets(tweets):
 
@@ -68,18 +66,20 @@ def get_word_features(wordlist):
 
 
 word_features = get_word_features(get_words_in_tweets(tweets))
-print(word_features)
+# Enlever les duplications
+featuresList = list(set(word_features))
+print(featuresList)
 
 def extract_features(document):
     document_words = set(document)
     features = {}
-    for word in word_features:
+    for word in featuresList:
         features['contains(%s)' % word] = (word in document_words)
     return features
 
 training_set = apply_features(extract_features, tweets)
 print(training_set)
-
+#training
 classifier = NaiveBayesClassifier.train(training_set)
 
 print(classifier.show_most_informative_features(32))
