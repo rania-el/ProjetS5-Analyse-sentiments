@@ -18,10 +18,6 @@ def extract(document):
                 tweets.append((row[2], row[3]))
                 i = i+1
 
-    with open('tweet.txt', 'w') as ff:
-        ff.write(str(tweets))
-    return tweets
-
 
 tweets = extract('Datasets/train.tsv')
 print(tweets)
