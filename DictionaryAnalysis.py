@@ -61,29 +61,6 @@ def sentiment(token):
         tweet_sentiment = '2'
     return tweet_sentiment
 
-
-def analyse_extracted_doc(jsondoc):
-    """
-    analyse sentiment from json document
-    :param jsondoc:
-    :return:
-    """
-    with open(jsondoc, 'r') as raw_data:
-        with open('Results/resultsDictionary.json', 'w') as result:
-            for line in raw_data:
-                if line != '\n':
-                    tweet = json.loads(line)
-                    tweet = tweet["text"]
-                    #print (tweet)
-                    token = preprocess(tweet)
-                    #print(token)
-                    tweet_sentiment = sentiment(token)
-                    #print(tweet_sentiment)
-                    json.dump({'tweet': tweet, 'sentiment': tweet_sentiment}, result)
-
-    print("SUCCESS")
-
-
 def analyse_data():
     with open('Datasets/train2.tsv','r') as data_in, open('Results/dictionary_train.tsv', 'w', newline='') as data_out:
         tsvin = csv.reader(data_in, delimiter='\t')
