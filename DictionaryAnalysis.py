@@ -1,5 +1,8 @@
 import json
 from Preproccessing import preprocess
+import csv
+from nltk import ConfusionMatrix
+from Preproccessing import extract
 
 def match_word(word,document):
     """
@@ -33,35 +36,38 @@ def positive_score(token):
     :return:
     """
 
-    pos_score=0
+    pos_score = 0
     for elt in token:
         if match_word(elt,"Dictionary/positive-words.txt"):
             pos_score+=1
     return pos_score
 
 def negative_score(token):
-    neg_score=0
+    neg_score = 0
     for elt in token:
         if match_word(elt,"Dictionary/negative-words.txt"):
-            neg_score+=1
+            neg_score += 1
     return neg_score
 
 
 def sentiment(token):
-    tweet_sentiment = 'neutral'
+    tweet_sentiment = '1'
     neg = negative_score(token)
     pos = positive_score(token)
     total = pos-neg
     if total < 0:
-        tweet_sentiment = 'negative'
+        tweet_sentiment = '0'
     if total > 0:
-        tweet_sentiment = 'positive'
+        tweet_sentiment = '2'
     return tweet_sentiment
 
 
-
-"""
 def analyse_extracted_doc(jsondoc):
+    """
+    analyse sentiment from json document
+    :param jsondoc:
+    :return:
+    """
     with open(jsondoc, 'r') as raw_data:
         with open('Results/resultsDictionary.json', 'w') as result:
             for line in raw_data:
@@ -76,35 +82,34 @@ def analyse_extracted_doc(jsondoc):
                     json.dump({'tweet': tweet, 'sentiment': tweet_sentiment}, result)
 
     print("SUCCESS")
-"""
 
-def analyse_test_data():
-    with open('Datasets/train.tsv','r') as data_in, open('Results/dictionary_train.tsv', 'w', newline='') as data_out:
+
+def analyse_data():
+    with open('Datasets/train2.tsv','r') as data_in, open('Results/dictionary_train.tsv', 'w', newline='') as data_out:
         tsvin = csv.reader(data_in, delimiter='\t')
-        tsvout = csv.writer(data_out,delimiter='\t')
-
+        tsvout = csv.writer(data_out, delimiter='\t')
         for row in tsvin:
-            tweet = row[2]
+            tweet = row[1]
+                #print(tweet)
             token = preprocess(tweet)
+                #print(token)
             tweet_sentiment = sentiment(token)
+                #print(tweet_sentiment)
             print(tweet+' '+tweet_sentiment)
-            tsvout.writerow((row[0], row[1], row[2], tweet_sentiment))
+            tsvout.writerow((row[0], row[1], tweet_sentiment))
 
 
-analyse_test_data()
+#analyse_data()
 
-def compare():
-    with open('Datasets/train2.tsv','r') as real_data, open('Results/dictionary_train.tsv', 'r') as analysed_data:
-        real_data = csv.reader(real_data, delimiter='\t')
-        analysed_data = csv.reader(analysed_data, delimiter='\t')
-        total=0
-        differences=0
-        for real, analysed in itertools.izip(real_data, analysed_data):
-            total+=1
-            if real[3]!=analysed[3]:
-                print ("difference")
-                differences+=1
+real_data = extract('Datasets/train2.tsv')
+analysed_data = extract('Results/dictionary_train.tsv')
+print(real_data)
+print(analysed_data)
+# build confusion matrix over test set
+test_truth = [s for (t, s) in real_data]
+test_predict = [s for (t, s) in analysed_data]
+print('Confusion Matrix')
+print(ConfusionMatrix(test_truth, test_predict))
 
-    print(str(differences) + " differenes out of "+str(total))
 
 
